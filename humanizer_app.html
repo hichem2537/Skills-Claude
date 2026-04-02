@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Humanizer — Carbon Tax Article</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f8f7f4; color: #1a1a18; min-height: 100vh; padding: 2rem 1rem; }
+  .container { max-width: 860px; margin: 0 auto; }
+  h1 { font-size: 22px; font-weight: 500; margin-bottom: 0.4rem; }
+  .subtitle { font-size: 14px; color: #5f5e5a; margin-bottom: 1.5rem; }
+  .metrics { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 1.5rem; }
+  .metric-card { background: #ededea; border-radius: 8px; padding: 0.75rem; text-align: center; }
+  .metric-val { font-size: 22px; font-weight: 500; }
+  .metric-lbl { font-size: 12px; color: #5f5e5a; margin-top: 2px; }
+  .progress-bar { height: 4px; background: #d3d1c7; border-radius: 2px; margin-bottom: 1.5rem; overflow: hidden; }
+  .progress-fill { height: 100%; background: #185FA5; border-radius: 2px; transition: width 0.3s; }
+  .tabs { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 1.5rem; }
+  .tab { padding: 6px 14px; font-size: 13px; border: 0.5px solid #b4b2a9; border-radius: 8px; cursor: pointer; background: white; color: #5f5e5a; transition: all 0.15s; }
+  .tab:hover { background: #f1efe8; }
+  .tab.active { background: #E6F1FB; color: #0C447C; border-color: #85B7EB; font-weight: 500; }
+  .tab.done { border-color: #5DCAA5; color: #0F6E56; background: #E1F5EE; }
+  .section-card { background: white; border: 0.5px solid #d3d1c7; border-radius: 12px; padding: 1.25rem; margin-bottom: 1rem; }
+  .section-label { font-size: 12px; font-weight: 500; color: #888780; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.75rem; }
+  .text-area { width: 100%; min-height: 160px; padding: 12px; font-size: 14px; line-height: 1.7; border: 0.5px solid #d3d1c7; border-radius: 8px; background: #f8f7f4; color: #1a1a18; resize: vertical; font-family: inherit; }
+  .text-area:focus { outline: none; border-color: #888780; }
+  .btn { padding: 8px 18px; font-size: 14px; border: 0.5px solid #b4b2a9; border-radius: 8px; cursor: pointer; font-family: inherit; transition: all 0.15s; }
+  .btn:active { transform: scale(0.98); }
+  .btn-primary { background: #185FA5; color: white; border-color: #185FA5; }
+  .btn-primary:hover { background: #0C447C; }
+  .btn-primary:disabled { background: #f1efe8; color: #888780; border-color: #d3d1c7; cursor: not-allowed; }
+  .btn-secondary { background: white; color: #1a1a18; }
+  .btn-secondary:hover { background: #f1efe8; }
+  .actions { display: flex; gap: 10px; margin-top: 1rem; align-items: center; flex-wrap: wrap; }
+  .status { font-size: 13px; color: #5f5e5a; }
+  .status.loading { color: #185FA5; }
+  .status.done { color: #0F6E56; }
+  .status.error { color: #A32D2D; }
+  .changes-list { margin-top: 0.5rem; }
+  .change-item { display: flex; align-items: flex-start; gap: 8px; padding: 6px 0; border-bottom: 0.5px solid #ededea; font-size: 13px; }
+  .change-item:last-child { border-bottom: none; }
+  .change-tag { font-size: 11px; padding: 2px 8px; border-radius: 8px; white-space: nowrap; font-weight: 500; flex-shrink: 0; }
+  .tag-removed { background: #FCEBEB; color: #A32D2D; }
+  .tag-added { background: #E1F5EE; color: #0F6E56; }
+  .tag-rewritten { background: #E6F1FB; color: #185FA5; }
+  .export-card { background: #E1F5EE; border: 0.5px solid #5DCAA5; border-radius: 12px; padding: 1.25rem; margin-top: 1.5rem; display: none; }
+  .export-card h3 { font-size: 15px; font-weight: 500; color: #085041; margin-bottom: 0.5rem; }
+  .export-card p { font-size: 13px; color: #0F6E56; margin-bottom: 1rem; }
+  .spinner { display: inline-block; width: 14px; height: 14px; border: 2px solid #85B7EB; border-top-color: #185FA5; border-radius: 50%; animation: spin 0.7s linear infinite; vertical-align: middle; margin-right: 6px; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .ai-note { font-size: 12px; color: #888780; font-style: italic; margin-top: 4px; }
+  .api-key-bar { background: white; border: 0.5px solid #FAC775; border-radius: 8px; padding: 0.75rem 1rem; margin-bottom: 1.5rem; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+  .api-key-bar label { font-size: 13px; color: #5f5e5a; white-space: nowrap; }
+  .api-key-bar input { flex: 1; min-width: 200px; padding: 6px 10px; font-size: 13px; border: 0.5px solid #d3d1c7; border-radius: 6px; font-family: monospace; }
+  .api-key-bar .hint { font-size: 12px; color: #888780; width: 100%; }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>Humanizer — Carbon Tax Article</h1>
+  <p class="subtitle">Supprime les patterns IA de l'article académique, section par section</p>
+
+  <div class="api-key-bar">
+    <label>Clé API Anthropic :</label>
+    <input type="password" id="api-key" placeholder="sk-ant-..." />
+    <button class="btn btn-secondary" onclick="saveKey()">Sauvegarder</button>
+    <span class="hint">Ta clé est stockée localement (localStorage) et n'est jamais envoyée ailleurs que api.anthropic.com</span>
+  </div>
+
+  <div class="metrics">
+    <div class="metric-card"><div class="metric-val" id="m-done">0</div><div class="metric-lbl">sections traitées</div></div>
+    <div class="metric-card"><div class="metric-val" id="m-total">7</div><div class="metric-lbl">sections totales</div></div>
+    <div class="metric-card"><div class="metric-val" id="m-pct">0%</div><div class="metric-lbl">progression</div></div>
+  </div>
+
+  <div class="progress-bar"><div class="progress-fill" id="progress" style="width:0%"></div></div>
+  <div class="tabs" id="tabs"></div>
+  <div id="section-view"></div>
+
+  <div class="export-card" id="export-card">
+    <h3>Toutes les sections sont humanisées !</h3>
+    <p>Clique sur le bouton pour télécharger un fichier texte avec toutes les sections corrigées.</p>
+    <button class="btn btn-primary" onclick="exportAll()">Télécharger le résultat (.txt)</button>
+  </div>
+</div>
+
+<script>
+const SECTIONS = [
+  {
+    id: "abstract", label: "Abstract",
+    text: `The UK Emissions Trading Scheme launched in January 2021; the EU Carbon Border Adjustment Mechanism has been phasing in since. Together they have transformed the carbon cost environment for energy-intensive industries operating in or trading across the UK–EU corridor. The combined sectoral burden, however, has not been measured.
+
+This paper constructs and estimates the implicit carbon tax burden (ICTB) — net ETS compliance cost as a share of sectoral value added — for eight carbon-intensive UK sectors, and asks how CBAM trade exposure amplifies that burden across 2021–2023.
+
+Estimation uses a balanced quarterly panel (N = 96) with a two-way fixed-effects model, extended by system GMM to address endogeneity in carbon intensity. The ICTB series draws on verified emission records, National Allocation Table entries, and ONS gross value added data.
+
+The mean ICTB sits at 4.71% of value added, ranging from 1.83% to 9.34%. A £10/tonne rise in the ETS carbon price adds 0.214 percentage points to ICTB (p < 0.01) — an effect 15–23% larger for sectors with above-median CBAM exposure. Free allocation erosion accounts for about 62% of the three-year ICTB trend.
+
+These findings bear on several live UK policy debates: when to introduce a domestic CBAM-equivalent, and whether free allocation reduction schedules should be differentiated across sectors whose decarbonisation trajectories diverge substantially.`
+  },
+  {
+    id: "intro", label: "1. Introduction",
+    text: `The convergence of two landmark regulatory developments has fundamentally reshaped the carbon cost architecture for energy-intensive industries in the United Kingdom. The UK Emissions Trading Scheme (UK ETS), launched in January 2021 following the country's departure from the European Union Emissions Trading System (EU ETS), introduced a standalone carbon pricing mechanism with an initial price support corridor and a progressively tightening cap. Concurrently, the European Union's Carbon Border Adjustment Mechanism (CBAM), entering its transitional reporting phase in October 2023 and scheduled for full financial implementation from January 2026, imposes a carbon cost on imports into the EU commensurate with the embedded emissions content of covered products (European Commission, 2023). For sectors domiciled in the UK and engaged in trade with the EU single market, the joint operation of these instruments creates a layered compliance burden that extends well beyond the direct costs captured by traditional single-instrument analyses.
+
+A central puzzle motivates this study: how large is the effective, or implicit, carbon tax burden faced by UK carbon-intensive sectors under the current UK ETS regime, and by how much is this burden amplified when CBAM-related trade exposure is incorporated? The question carries considerable policy urgency. With UK ETS allowance prices ranging from approximately £44 to £84 per tonne of CO₂ equivalent over the 2021–2023 period (UK ETS Authority, 2023) and with CBAM-covered product categories collectively accounting for nearly 18% of UK goods exports to EU27 partner countries (ONS, 2023), the fiscal and competitive implications of this carbon cost architecture demand rigorous empirical scrutiny.
+
+Despite extensive research on the EU ETS and its economic impacts (Dechezleprêtre et al., 2023; Calel & Dechezleprêtre, 2016; Koch et al., 2014), the UK ETS now entering its third year of independent operation has received comparatively limited systematic academic attention. Existing analyses of carbon border adjustment instruments have largely focused on general equilibrium leakage-prevention effects (Böhringer et al., 2012; Pisani-Ferry & Mahfouz, 2023), leaving the question of sector-level implicit burden in a post-Brexit regulatory context largely unaddressed. This paper contributes directly to filling that gap.
+
+This study investigates three interrelated questions. First, what is the magnitude of the implicit carbon tax burden imposed on carbon-intensive UK sectors through UK ETS compliance, measured as a share of sectoral gross value added? Second, to what extent does CBAM exposure amplify this burden beyond the direct ETS compliance cost? Third, what role does the progressive erosion of freely allocated emission allowances play in driving the secular upward trend in implicit burden over the 2021–2023 period?`
+  },
+  {
+    id: "litreview", label: "2. Literature Review",
+    text: `The intellectual architecture of carbon pricing rests on two foundational pillars separated by more than a century of theoretical development yet deeply intertwined in their policy applications. Pigou's (1920) seminal treatment of externalities established the normative case for taxing activities whose social cost exceeds their private cost — a principle applied to greenhouse gas emissions implies a levy equal to the marginal damage of an additional tonne of CO₂. Dales (1968) advanced a complementary but institutionally distinct alternative: rather than fixing the carbon price and allowing quantity to adjust, governments could cap aggregate emissions and distribute tradeable property rights, allowing decentralised exchange to discover the equilibrium permit price.
+
+Building on these foundations, Baumol and Oates (1988) developed a comprehensive theory of environmental policy instruments. As Goulder and Schein (2013) argued in an influential review, neither carbon taxes nor cap-and-trade systems dominate in all dimensions: taxes provide price certainty and revenue predictability but may fail to guarantee emission reductions, while cap-and-trade systems ensure environmental integrity but expose regulated entities to price volatility.
+
+The Carbon Border Adjustment Mechanism represents a qualitatively new dimension in climate policy architecture. Rather than supplementing domestic carbon pricing with output subsidies or tariff rebates, CBAM seeks to equalise the effective carbon cost burden between domestic producers subject to EU ETS obligations and importers from third countries with lower or absent carbon pricing. Pisani-Ferry and Mahfouz (2023) provided an analytical framework for understanding CBAM's macroeconomic implications, suggesting that CBAM could generate up to €9 billion in annual EU revenue at full implementation, while simultaneously creating incentives for third-country governments to strengthen domestic carbon pricing (Fankhauser et al., 2010).
+
+The concept of the implicit carbon tax burden — the effective fiscal incidence of carbon pricing as a share of economic output — has received growing attention as an alternative to the more commonly cited carbon price level. Metcalf (2019) argued that carbon price levels, absent information about the production structure and carbon intensity of regulated sectors, convey limited information about the distributional or growth implications of carbon policy.`
+  },
+  {
+    id: "data", label: "3. Data & Methodology",
+    text: `The empirical analysis draws on a balanced panel of eight carbon-intensive sectors — steel (SIC 24.1), cement and lime (SIC 23.5), oil refining (SIC 19.2), flat and container glass (SIC 23.1), ceramic products (SIC 23.2–23.4), paper and pulp (SIC 17.1–17.2), domestic aviation, and basic organic chemicals (SIC 20.1) — observed at quarterly frequency over Q1 2021 to Q4 2023. Sector selection follows the coverage of the UK ETS as defined by the UK ETS Authority (2023), restricted to sectors for which reliable quarterly data on gross value added, carbon compliance costs, and bilateral trade flows are available from public administrative sources. Together, these eight sectors accounted for approximately 73% of total UK ETS-covered verified emissions in 2022.
+
+Sectoral gross value added data are sourced from the ONS Quarterly National Accounts, seasonally adjusted at constant 2019 prices. UK ETS allowance price data are drawn from the ICE UK CarbonControl daily settlement series, aggregated to quarterly averages. Verified emissions data at sector level are obtained from the UK ETS Public Register maintained by the Environment Agency (2023). Free allocation data by installation and sector are sourced from the UK ETS Authority's National Allocation Table.
+
+The baseline econometric model takes the following two-way fixed-effects form: ICTB_it = α_i + β₁CP_t + β₂FA_it + β₃CI_it + β₄CBAM_EXP_it + β₅(CP_t × CBAM_EXP_it) + γ₁SIZE_it + γ₂ENERGY_it + δ_t + ε_it. The model includes sector fixed effects to control for time-invariant characteristics and time fixed effects to absorb common macroeconomic shocks.
+
+A key endogeneity concern arises from reverse causality between carbon intensity and ICTB. To address this, we complement the TWFE baseline with system GMM (Blundell & Bond, 1998), treating carbon intensity and CBAM exposure as predetermined. Panel unit root tests (Im et al., 2003) are conducted as preliminary diagnostics.`
+  },
+  {
+    id: "results", label: "4. Empirical Results",
+    text: `Table 2 reveals a striking pattern of heterogeneity in the implicit carbon tax burden and its principal determinants across UK carbon-intensive sectors. The mean ICTB of 4.71% masks a sevenfold variation from chemicals (1.83%) to steel (9.34%) that primarily reflects differences in carbon intensity rather than differences in free allocation generosity. The strong positive correlation between ICTB and CI (r = 0.891, p < 0.01) confirms that carbon intensity is the primary structural determinant of burden level.
+
+Perhaps most strikingly, the carbon price coefficient (β₁ = 0.214, SE = 0.038, p < 0.01 in the preferred FE specification) implies that a £10/tonne increase in the ETS price is associated with a 0.214 percentage point increase in ICTB, conditional on free allocation rates and carbon intensity. This represents a 4.5% increase relative to the sample mean burden and proves robust across all four specifications reported in Table 5.
+
+The free allocation coefficient (β₂ = −0.211, SE = 0.028, p < 0.01) indicates that a one percentage point reduction in the free allocation rate is associated with a 0.211 percentage point rise in ICTB, consistent with H3. Given that free allocation rates declined by approximately 18 percentage points on average over the three-year sample, this coefficient implies an allocation-driven ICTB increase of approximately 3.8 percentage points, accounting for the 62% share attributed to this mechanism in the variance decomposition.
+
+The interaction term between carbon price and CBAM exposure (β₅ = 0.063, SE = 0.018, p < 0.01) confirms H2. We interpret this pattern as evidence of anticipatory compliance behaviour — sector-level evidence that firms are beginning to factor CBAM obligations into operational planning even during the transitional period.`
+  },
+  {
+    id: "discussion", label: "5. Discussion",
+    text: `The finding that UK carbon-intensive sectors bear an average implicit carbon tax burden of 4.71% of sectoral value added — rising to 9.34% in steel and exhibiting a secular upward trend driven principally by free allocation erosion — situates the UK ETS in a revealing comparative perspective. The estimated burden levels are broadly consistent with the range reported for EU ETS-covered sectors by Dechezleprêtre et al. (2023), who found mean compliance costs of 3.5–6.8% of value added across Phases 1–3 of the EU ETS. What distinguishes our findings from the prior EU ETS literature is the documentation of the CBAM amplification channel.
+
+This is not a trivial observation. It implies that any assessment of UK industrial decarbonisation costs that treats the UK ETS in isolation — as most existing studies necessarily do — will systematically underestimate the effective compliance burden for trade-exposed sectors. For the steel and cement industries, where CBAM exposure indices exceed 0.70, the amplification effect is substantial enough to materially alter the competitive calculus of investment and production location decisions.
+
+Paradoxically, the very mechanisms designed to accelerate decarbonisation — tighter caps and reduced free allocation — may also generate transitional competitiveness pressures that CBAM is theoretically intended to mitigate. Our finding that CBAM exposure amplifies the carbon price effect by 15–23% raises a substantive policy question: will the UK's own CBAM-equivalent instrument, targeted for implementation around 2027, arrive in time to prevent a competitive wedge from opening between UK and EU producers during the 2026–2027 window?
+
+It is important to acknowledge that our analysis covers only three years of UK ETS operation, a period that includes the extraordinary energy market disruption of 2022. The long-run ICTB trajectory as prices stabilise post-energy-crisis may differ materially from the patterns documented here.`
+  },
+  {
+    id: "conclusion", label: "6. Conclusion",
+    text: `This paper has examined the implicit carbon tax burden imposed on UK carbon-intensive sectors through the joint operation of UK ETS compliance obligations and CBAM-related trade exposure over Q1 2021 to Q4 2023. Three main findings emerge. First, the average ICTB stands at 4.71% of sectoral gross value added, with a sevenfold cross-sector variation (1.83% in chemicals to 9.34% in steel) driven primarily by differences in carbon intensity. Second, sectors with above-median CBAM exposure face effective carbon cost increases 15–23% larger than their less-exposed counterparts for a given carbon price movement, suggesting anticipatory compliance behaviour during the transitional phase. Third, the erosion of free allocation accounts for approximately 62% of the observed upward trend in ICTB, confirming the UK ETS Authority's pre-announced allocation schedule as the primary structural driver of rising carbon cost burden.
+
+For the UK ETS Authority, these results underscore the distributional asymmetry of the current uniform free allocation reduction schedule: an equal percentage point reduction falls disproportionately on high-carbon-intensity sectors with limited near-term abatement options. A differentiated schedule calibrated to sectoral decarbonisation trajectories would better align the pace of allocation reduction with credible outcomes while managing transitional competitive costs.
+
+For UK trade policy, the CBAM amplification finding argues for accelerating the development of the UK's own carbon border instrument. With the EU CBAM reaching full implementation in January 2026 and the UK equivalent not expected before 2027, UK exporters to EU markets face an asymmetric compliance cost during the intervening period.
+
+Three avenues follow directly from this analysis. First, installation-level data through the UK ETS Public Register will enable more granular within-sector analysis. Second, the full implementation of EU CBAM from 2026 will generate ex-post compliance cost measures to validate the anticipatory effects documented here. Third, extending the analysis to encompass carbon contracts for difference and the proposed net-zero hydrogen support schemes will be essential for assessing the total carbon cost landscape facing UK industry.`
+  }
+];
+
+const state = { current: 0, humanized: {}, loading: false };
+
+function saveKey() {
+  const k = document.getElementById('api-key').value.trim();
+  if (k) { localStorage.setItem('anthropic_key', k); alert('Clé sauvegardée !'); }
+}
+
+function getKey() {
+  return document.getElementById('api-key').value.trim() || localStorage.getItem('anthropic_key') || '';
+}
+
+window.addEventListener('load', () => {
+  const saved = localStorage.getItem('anthropic_key');
+  if (saved) document.getElementById('api-key').value = saved;
+});
+
+function updateMetrics() {
+  const done = Object.keys(state.humanized).length;
+  const total = SECTIONS.length;
+  const pct = Math.round(done / total * 100);
+  document.getElementById('m-done').textContent = done;
+  document.getElementById('m-pct').textContent = pct + '%';
+  document.getElementById('progress').style.width = pct + '%';
+  document.getElementById('export-card').style.display = done === total ? 'block' : 'none';
+}
+
+function renderTabs() {
+  document.getElementById('tabs').innerHTML = SECTIONS.map((s, i) => {
+    let cls = 'tab';
+    if (i === state.current) cls += ' active';
+    if (state.humanized[s.id]) cls += ' done';
+    return `<button class="${cls}" onclick="selectSection(${i})">${s.label}</button>`;
+  }).join('');
+}
+
+function renderSection() {
+  const s = SECTIONS[state.current];
+  const h = state.humanized[s.id];
+  let html = `<div class="section-card">
+    <div class="section-label">Texte original</div>
+    <textarea class="text-area" readonly>${s.text}</textarea>
+  </div>`;
+  if (h) {
+    html += `<div class="section-card">
+      <div class="section-label">Version humanisée ✓</div>
+      <textarea class="text-area" id="humanized-text" style="border-color:#5DCAA5;min-height:200px;">${h.text}</textarea>
+    </div>
+    <div class="section-card">
+      <div class="section-label">Patterns IA corrigés</div>
+      <div class="changes-list">${h.changes.map(c => `
+        <div class="change-item">
+          <span class="change-tag tag-${c.type}">${c.type}</span>
+          <span style="color:#5f5e5a">${c.desc}</span>
+        </div>`).join('')}</div>
+    </div>`;
+  }
+  html += `<div class="actions">
+    <button class="btn btn-primary" id="btn-humanize" onclick="humanizeSection()" ${state.loading ? 'disabled' : ''}>
+      ${state.loading ? '<span class="spinner"></span>En cours...' : h ? 'Re-humanizer' : 'Humanizer cette section'}
+    </button>
+    ${state.current < SECTIONS.length - 1 ? `<button class="btn btn-secondary" onclick="selectSection(${state.current + 1})">Section suivante →</button>` : ''}
+    <span class="status ${state.loading ? 'loading' : ''}" id="status-msg"></span>
+  </div>
+  <p class="ai-note">Analyse effectuée via l'API Anthropic (claude-sonnet-4-20250514)</p>`;
+  document.getElementById('section-view').innerHTML = html;
+}
+
+function selectSection(i) {
+  state.current = i;
+  renderTabs();
+  renderSection();
+}
+
+async function humanizeSection() {
+  if (state.loading) return;
+  const apiKey = getKey();
+  if (!apiKey) { alert('Entre ta clé API Anthropic en haut de la page.'); return; }
+  state.loading = true;
+  renderSection();
+  const s = SECTIONS[state.current];
+  const prompt = `You are a writing editor specialized in removing AI-generated writing patterns from academic texts.
+
+Here is a section of an academic paper on UK carbon taxation. Humanize it by:
+1. Removing AI patterns: vague attributions, formulaic phrases, -ing endings for fake depth, promotional language, excessive signposting, hollow objective statements
+2. Varying sentence rhythm (mix short punchy sentences with longer ones)
+3. Adding analytical voice and specific insights
+4. Reducing passive voice saturation
+5. Making transitions feel natural, not algorithmic
+
+IMPORTANT: Keep all citations, statistics, and technical content intact. This is academic writing — maintain scholarly register but make it feel written by a real researcher with opinions.
+
+Return a JSON object with this exact structure:
+{"humanized": "the full humanized text here", "changes": [{"type": "removed|rewritten|added", "desc": "brief description of what was changed (max 80 chars)"}]}
+
+Return ONLY the JSON, no markdown, no preamble.
+
+Section to humanize:
+${s.text}`;
+
+  try {
+    const response = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "x-api-key": apiKey, "anthropic-version": "2023-06-01", "anthropic-dangerous-direct-browser-access": "true" },
+      body: JSON.stringify({ model: "claude-sonnet-4-20250514", max_tokens: 1000, messages: [{ role: "user", content: prompt }] })
+    });
+    const data = await response.json();
+    if (data.error) throw new Error(data.error.message);
+    const raw = data.content.map(i => i.text || "").join("");
+    const parsed = JSON.parse(raw.replace(/```json|```/g, "").trim());
+    state.humanized[s.id] = { text: parsed.humanized, changes: parsed.changes || [] };
+    state.loading = false;
+    updateMetrics();
+    renderTabs();
+    renderSection();
+  } catch (err) {
+    state.loading = false;
+    renderSection();
+    const el = document.getElementById('status-msg');
+    if (el) { el.className = 'status error'; el.textContent = 'Erreur : ' + err.message; }
+  }
+}
+
+function exportAll() {
+  let content = "ARTICLE HUMANISÉ — Carbon Tax UK ETS CBAM\n";
+  content += "Généré le " + new Date().toLocaleDateString('fr-FR') + "\n";
+  content += "=".repeat(60) + "\n\n";
+  SECTIONS.forEach(s => {
+    content += s.label.toUpperCase() + "\n" + "-".repeat(40) + "\n";
+    content += (state.humanized[s.id] ? state.humanized[s.id].text : s.text) + "\n\n";
+  });
+  const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'Carbon_Tax_Article_Humanised.txt';
+  a.click();
+}
+
+renderTabs();
+renderSection();
+updateMetrics();
+</script>
+</body>
+</html>
